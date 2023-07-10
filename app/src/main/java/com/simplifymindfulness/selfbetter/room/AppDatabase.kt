@@ -4,10 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
-@Database(entities = [Habit::class], version = 5)
+@Database(entities = [Habit::class ,HabitStatus::class], version = 7)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun habitDao(): HabitDao
+    abstract fun habitStatusDao(): HabitStatusDao
 
     companion object {
         @Volatile

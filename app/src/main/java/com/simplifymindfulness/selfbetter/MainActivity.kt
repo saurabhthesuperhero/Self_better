@@ -68,7 +68,8 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     // Create an instance of your HabitRepository
                     val habitDao = AppDatabase.getDatabase(this).habitDao()
-                    val repository = HabitRepository(habitDao)
+                    val habitStatusDao = AppDatabase.getDatabase(this).habitStatusDao()
+                    val repository = HabitRepository(habitDao,habitStatusDao)
 
                     // Create an instance of your HabitViewModel
                     val viewModel = HabitViewModel(repository)
