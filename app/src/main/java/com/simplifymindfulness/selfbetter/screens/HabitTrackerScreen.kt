@@ -33,7 +33,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -159,7 +161,6 @@ fun getWeeksFromToday(today: LocalDate, weeksCount: Int): List<List<LocalDate>> 
     return weeks
 }
 
-
 @Composable
 fun TaskListView(viewModel: HabitViewModel, date: LocalDate) {  // Add the ViewModel as a parameter
     val habits by viewModel.habits.collectAsState(initial = emptyList())  // Use collectAsState instead of observeAsState
@@ -172,6 +173,12 @@ fun TaskListView(viewModel: HabitViewModel, date: LocalDate) {  // Add the ViewM
         items(habits) { habit ->  // Use the habits list here
             val status by viewModel.getHabitStatus(habit.id, date).collectAsState(null)
             var isTicked by remember { mutableStateOf(status?.isDone ?: false) }
+
+            // Update isTicked whenever status changes
+            LaunchedEffect(status) {
+                isTicked = status?.isDone ?: false
+            }
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -207,6 +214,10 @@ fun TaskListView(viewModel: HabitViewModel, date: LocalDate) {  // Add the ViewM
         }
     }
 }
+
+
+
+
 
 
 
