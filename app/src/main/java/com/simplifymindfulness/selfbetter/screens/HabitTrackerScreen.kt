@@ -21,7 +21,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
@@ -34,8 +33,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,14 +53,18 @@ import org.threeten.bp.LocalDate
 
 @Composable
 fun HabitTrackerApp(viewModel: HabitViewModel, navController: NavController) {
+    var selectedDate = remember { mutableStateOf(LocalDate.now()) }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        CalendarView()
-        TaskListView(viewModel, LocalDate.now())  // Pass the current date here
+        CalendarView(selectedDate = selectedDate)
+        TaskListView(viewModel, selectedDate)
+        Spacer(modifier = Modifier.weight(1f)) // This pushes the remaining content to the top
+// Pass the current date here
         Button(
             onClick = { navController.navigate(Screen.NewHabit.route) },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
+                .fillMaxWidth() // This makes the button stretch fully
                 .padding(16.dp)
         ) {
             Text("Create New Habit")
@@ -72,8 +75,7 @@ fun HabitTrackerApp(viewModel: HabitViewModel, navController: NavController) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun CalendarView() {
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+fun CalendarView(selectedDate: MutableState<LocalDate>) {
     val today = LocalDate.now()
     Log.e("TAG", "CalendarView: $today")
 
@@ -88,8 +90,8 @@ fun CalendarView() {
 
     Column(modifier = Modifier.fillMaxWidth()) {
         val displayText = when {
-            selectedDate == today -> "Today"
-            else -> selectedDate.toString()
+            selectedDate.value == today -> "Today"
+            else -> selectedDate.value.toString()
         }
         Text(
             text = displayText,
@@ -128,8 +130,8 @@ fun CalendarView() {
                             .height(48.dp)  // Add a fixed height
                             .clip(CircleShape)
                             .clickable(
-                            ) { selectedDate = date }
-                            .background(if (date == selectedDate) MaterialTheme.colorScheme.onTertiary else Color.Transparent),
+                            ) { selectedDate.value = date }
+                            .background(if (date == selectedDate.value) MaterialTheme.colorScheme.onTertiary else Color.Transparent),
 
                         contentAlignment = Alignment.Center
                     ) {
@@ -162,16 +164,19 @@ fun getWeeksFromToday(today: LocalDate, weeksCount: Int): List<List<LocalDate>> 
 }
 
 @Composable
-fun TaskListView(viewModel: HabitViewModel, date: LocalDate) {  // Add the ViewModel as a parameter
+fun TaskListView(
+    viewModel: HabitViewModel,
+    date: MutableState<LocalDate>
+) {  // Add the ViewModel as a parameter
     val habits by viewModel.habits.collectAsState(initial = emptyList())  // Use collectAsState instead of observeAsState
 
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.7f)  // This makes the LazyColumn take up only 70% of the available space
+            .fillMaxHeight(0.88f)  // This makes the LazyColumn take up only 70% of the available space
     ) {
         items(habits) { habit ->  // Use the habits list here
-            val status by viewModel.getHabitStatus(habit.id, date).collectAsState(null)
+            val status by viewModel.getHabitStatus(habit.id, date.value).collectAsState(null)
             var isTicked by remember { mutableStateOf(status?.isDone ?: false) }
 
             // Update isTicked whenever status changes
@@ -196,12 +201,19 @@ fun TaskListView(viewModel: HabitViewModel, date: LocalDate) {  // Add the ViewM
                 ) {
                     IconButton(onClick = {
                         isTicked = !isTicked
-                        viewModel.insertOrUpdateHabitStatus(HabitStatus(0, habit.id, date, isTicked))
+                        viewModel.insertOrUpdateHabitStatus(
+                            HabitStatus(
+                                habit.id,
+                                date.value,
+                                isTicked
+                            )
+                        )  // Always use 0 as the id here
+
                     }) {
                         Icon(
-                            imageVector = if (isTicked) Icons.Default.Check else Icons.Default.CheckCircle,
+                            imageVector = if (isTicked) Icons.Default.CheckCircle else Icons.Default.Check,
                             contentDescription = if (isTicked) "Checked" else "Unchecked",
-                            tint = if (isTicked) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                            tint = if (isTicked) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     Spacer(modifier = Modifier.width(16.dp))
