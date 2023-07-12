@@ -262,13 +262,16 @@ fun TaskListView(
     date: MutableState<LocalDate>
 ) {  // Add the ViewModel as a parameter
     val habits by viewModel.habits.collectAsState(initial = emptyList())  // Use collectAsState instead of observeAsState
-
+    val filteredHabits = habits.filter { habit ->
+        val habitDays = habit.days.split(",")  // Assuming days is a comma-separated string
+        habitDays.contains(date.value.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()))
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.88f)  // This makes the LazyColumn take up only 70% of the available space
+            .fillMaxHeight(0.8f)  // This makes the LazyColumn take up only 70% of the available space
     ) {
-        items(habits) { habit ->  // Use the habits list here
+        items(filteredHabits) { habit ->  // Use the habits list here
             val status by viewModel.getHabitStatus(habit.id, date.value).collectAsState(null)
             var isTicked by remember { mutableStateOf(status?.isDone ?: false) }
 
