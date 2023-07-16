@@ -22,12 +22,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,11 +52,8 @@ import com.simplifymindfulness.selfbetter.Screen
 import com.simplifymindfulness.selfbetter.room.HabitStatus
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
-import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.TextStyle
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 @Composable
@@ -84,51 +79,6 @@ fun HabitTrackerApp(viewModel: HabitViewModel, navController: NavController) {
 
     }
 }
-
-@Composable
-fun ColorShadesView(colorScheme: ColorScheme) {
-    val colorProperties = mapOf(
-        "Primary" to colorScheme.primary,
-        "OnPrimary" to colorScheme.onPrimary,
-        "PrimaryContainer" to colorScheme.primaryContainer,
-        "OnPrimaryContainer" to colorScheme.onPrimaryContainer,
-        "InversePrimary" to colorScheme.inversePrimary,
-        "Secondary" to colorScheme.secondary,
-        "OnSecondary" to colorScheme.onSecondary,
-        "SecondaryContainer" to colorScheme.secondaryContainer,
-        "OnSecondaryContainer" to colorScheme.onSecondaryContainer,
-        "Tertiary" to colorScheme.tertiary,
-        "OnTertiary" to colorScheme.onTertiary,
-        "TertiaryContainer" to colorScheme.tertiaryContainer,
-        "OnTertiaryContainer" to colorScheme.onTertiaryContainer,
-        "Background" to colorScheme.background,
-        "OnBackground" to colorScheme.onBackground,
-        "Surface" to colorScheme.surface,
-        "OnSurface" to colorScheme.onSurface,
-        "SurfaceVariant" to colorScheme.surfaceVariant,
-        "OnSurfaceVariant" to colorScheme.onSurfaceVariant,
-        "SurfaceTint" to colorScheme.surfaceTint,
-        "InverseSurface" to colorScheme.inverseSurface,
-        "InverseOnSurface" to colorScheme.inverseOnSurface,
-        "Error" to colorScheme.error,
-        "OnError" to colorScheme.onError,
-        "ErrorContainer" to colorScheme.errorContainer,
-        "OnErrorContainer" to colorScheme.onErrorContainer,
-        "Outline" to colorScheme.outline,
-        "OutlineVariant" to colorScheme.outlineVariant,
-        "Scrim" to colorScheme.scrim
-    )
-
-    LazyColumn {
-        items(colorProperties.entries.toList()) { (propertyName, colorValue) ->
-            colorValue?.let { color ->
-                ColorShadeItem(propertyName, color)
-            }
-        }
-    }
-}
-
-
 
 @Composable
 fun ColorShadeItem(name: String, color: Color) {
